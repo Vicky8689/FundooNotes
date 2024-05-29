@@ -1,0 +1,29 @@
+# Ignore launchSettings.json
+**/Properties/launchSettings.json
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.userosscache
+*.suo
+
+# Ignore Rider specific files
+.idea/
+
+# Ignore Visual Studio specific files
+.vs/
+
+# Ignore temporary files
+*.log
+*.tlog
+*.ide
+
+# Ignore packages directory
+packages/
+
+# Ignore other common files and directories
+*.DS_Store
+Thumbs.db
