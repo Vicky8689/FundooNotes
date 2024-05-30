@@ -5,6 +5,7 @@ using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +21,9 @@ namespace BusineesLayer.Services
        
         public async Task<bool> UserRegistration(RegistrationRequestModel userModel)
         {
+            //Hash the user password
+            userModel.Password = HashPasswordBL.HashPsaaword(userModel.Password);
+
             var result = await _userRL.UserRegistration(userModel);
             if (result != null)
             {
