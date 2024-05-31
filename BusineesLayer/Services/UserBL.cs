@@ -33,5 +33,19 @@ namespace BusineesLayer.Services
             return false;
 
         }
+
+
+        public async Task<bool> Login(LoginRequestModel loginModel)
+        {
+           var result = await _userRL.Login(loginModel);
+            if (result != null)
+            {
+                bool verifyUser = HashPasswordBL.VerifyHash(loginModel.Password, result.Password);
+
+                return verifyUser;
+            }
+            return false;
+        }
+
     }
 }

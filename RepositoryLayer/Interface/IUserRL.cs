@@ -10,5 +10,6 @@ namespace RepositoryLayer.Interface
     public interface IUserRL
     {
         public Task<UserEntity> UserRegistration(RegistrationRequestModel userModel);
+        public Task<UserEntity> Login(LoginRequestModel userModel);
     }
 }

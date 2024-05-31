@@ -11,11 +11,12 @@ namespace FundooNotes.Controllers
     public class LoginRegistrationController : Controller
     {
         private readonly IUserBL _userBL;
+        
         public LoginRegistrationController(IUserBL userBL)
         {
             _userBL = userBL;           
         }
-
+        //Registration
         [Route("Registration")]
         [HttpPost]
         public async Task<IActionResult> RegistrationController(RegistrationRequestModel userModel)
@@ -46,5 +47,40 @@ namespace FundooNotes.Controllers
           
            
         }
+
+
+        //login
+        [Route("login")]
+        [HttpGet]
+        public async Task<IActionResult> LoginController(LoginRequestModel loginModel)
+        {
+            var result = await _userBL.Login(loginModel);
+            ResponseModel<LoginResponseModel> response = new ResponseModel<LoginResponseModel>();
+            LoginResponseModel loginResponseModel = new LoginResponseModel();
+            if (result)
+            {
+                
+                loginResponseModel.Email = loginModel.Email;
+                response.Success = true;
+                response.Message = "Login Successful";
+                response.Data = loginResponseModel;
+                return Ok(response);
+            }
+            else
+            {
+                loginResponseModel.Email = loginModel.Email;
+                response.Success = false;
+                response.Message = "Invalid Credentials";
+                response.Data = loginResponseModel;
+                return BadRequest(response);
+            }
+
+            
+
+        }
+
+    
+    
+    
     }
 }
