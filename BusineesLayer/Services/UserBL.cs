@@ -1,6 +1,8 @@
 ﻿using BusineesLayer.Interface;
+using Microsoft.Extensions.Configuration;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
+using RepositoryLayer.Helper;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
@@ -14,9 +16,11 @@ namespace BusineesLayer.Services
     public class UserBL:IUserBL
     {
         private readonly IUserRL _userRL;
-        public UserBL(IUserRL userRL)
+        private readonly IConfiguration _configuration;
+        public UserBL(IUserRL userRL,IConfiguration configuration)
         {
             _userRL = userRL;
+            _configuration = configuration;
         }
        
         public async Task<bool> UserRegistration(RegistrationRequestModel userModel)
@@ -35,16 +39,20 @@ namespace BusineesLayer.Services
         }
 
 
-        public async Task<bool> Login(LoginRequestModel loginModel)
+        public async Task<string> Login(LoginRequestModel loginModel)
         {
            var result = await _userRL.Login(loginModel);
             if (result != null)
             {
-                bool verifyUser = HashPasswordBL.VerifyHash(loginModel.Password, result.Password);
+                bool verifyUser = HashPasswordBL.VerifyHash(loginModel.Password, result.Password);               
+                if (verifyUser)
+                {
 
-                return verifyUser;
+                return new TokenGenerateRL().GenerateTokenRL(result);
+                }
+              //  return verifyUser;
             }
-            return false;
+            return null;
         }
 
     }

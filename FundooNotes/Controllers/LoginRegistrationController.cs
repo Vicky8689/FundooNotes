@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
+using RepositoryLayer.Helper;
 using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
@@ -57,12 +58,12 @@ namespace FundooNotes.Controllers
             var result = await _userBL.Login(loginModel);
             ResponseModel<LoginResponseModel> response = new ResponseModel<LoginResponseModel>();
             LoginResponseModel loginResponseModel = new LoginResponseModel();
-            if (result)
+            if (result!=null)
             {
                 
                 loginResponseModel.Email = loginModel.Email;
                 response.Success = true;
-                response.Message = "Login Successful";
+                response.Message = result;
                 response.Data = loginResponseModel;
                 return Ok(response);
             }
@@ -78,6 +79,10 @@ namespace FundooNotes.Controllers
             
 
         }
+
+       
+
+
 
     
     

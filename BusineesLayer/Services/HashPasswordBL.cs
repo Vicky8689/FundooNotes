@@ -7,7 +7,7 @@ namespace BusineesLayer.Services
 {
     public class HashPasswordBL
     {
-        
+
         public static string HashPsaaword(string password)
         {
             byte[] salt;
@@ -43,6 +43,7 @@ namespace BusineesLayer.Services
             string enterPasswordHash = Convert.ToBase64String(newGenretedHash);
             if(enterPasswordHash.Equals( storedPassword))
             {
+
                 return true;
             }
             return false;

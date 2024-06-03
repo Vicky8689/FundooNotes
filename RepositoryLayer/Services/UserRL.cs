@@ -53,7 +53,7 @@ namespace RepositoryLayer.Services
         public async Task<UserEntity> Login(LoginRequestModel loginModel)
         {
 
-            return await _Context.Users.FirstOrDefaultAsync(x => x.Email == loginModel.Email);
+            return await _Context.Users.FirstOrDefaultAsync(x => x.Email == loginModel.Email );
 
         }
 

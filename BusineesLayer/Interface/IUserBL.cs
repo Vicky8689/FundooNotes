@@ -10,6 +10,6 @@ namespace BusineesLayer.Interface
     public interface IUserBL
     {
         public Task<bool> UserRegistration(RegistrationRequestModel userModel);
-        public Task<bool> Login(LoginRequestModel loginModel);
+        public Task<string> Login(LoginRequestModel loginModel);
     }
 }
