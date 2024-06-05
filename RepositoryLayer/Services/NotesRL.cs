@@ -92,5 +92,17 @@ namespace RepositoryLayer.Services
 
         }
 
+        public NotesEntity NotesById(int userId, int noteId)
+        {
+            var getNote = _context.Notes.FirstOrDefault(x=>x.UserId==userId && x.NoteId==noteId);
+            if(getNote != null)
+            {
+                return getNote;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

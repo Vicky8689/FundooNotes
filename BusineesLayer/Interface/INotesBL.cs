@@ -14,5 +14,7 @@ namespace BusineesLayer.Interface
         public NotesEntity DeleteNoteById(int userId,int noteId);
 
         public NotesEntity UpdateNoteById(int userId,int noteId, UpdateNoteRequestModel data);
+
+        public NotesEntity NotesById(int userId,int noteId);
     }
 }

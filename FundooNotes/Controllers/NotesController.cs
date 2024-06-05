@@ -138,5 +138,37 @@ namespace FundooNotes.Controllers
             return Ok(response);
         }
 
+        //GetNoteById
+        [HttpGet]
+        [Authorize]
+        [Route("NoteById")]
+        public IActionResult GetNotesByIdController(NoteByIdrequestModel requestModel)
+        {
+            ResponseModel<NotesResponseModel> response = new ResponseModel<NotesResponseModel>();
+            
+            
+            try
+            {
+                var id = User.FindFirstValue("UserID");
+                int userId = Convert.ToInt32(id);
+                var result = _notesBL.NotesById(userId,requestModel.noteId);
+
+                if (result != null)
+                {
+                    NotesResponseModel note = new NotesResponseModel() {noteId =result.NoteId,title=result.Title,description =result.Description,color= result.Color };
+                    response.Message = "Successfully";
+                    response.Data = note;
+                }
+                else
+                {
+                    response.Message = "Unsuccessfully";
+                }
+            }
+            catch (Exception ex) { }
+            return Ok(response);
+        }
+
+
+
     }
 }

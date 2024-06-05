@@ -38,5 +38,11 @@ namespace BusineesLayer.Services
             return _notesRL.UpdateNoteById(userId, noteId,data );
         }
 
+        //get note by id
+        public NotesEntity NotesById(int userId, int noteId)
+        {
+            return _notesRL.NotesById(userId, noteId);
+        }
+
     }
 }
