@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RepositoryLayer.Context;
 
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooNotesContext))]
-    partial class FundooNotesContextModelSnapshot : ModelSnapshot
+    [Migration("20240603075507_AddNoteTable1")]
+    partial class AddNoteTable1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,10 +26,6 @@ namespace RepositoryLayer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -45,12 +43,7 @@ namespace RepositoryLayer.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasMaxLength(50);
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("NoteId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Notes");
                 });
@@ -83,15 +76,6 @@ namespace RepositoryLayer.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("RepositoryLayer.Entity.NotesEntity", b =>
-                {
-                    b.HasOne("RepositoryLayer.Entity.UserEntity", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

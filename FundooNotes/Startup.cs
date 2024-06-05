@@ -36,10 +36,12 @@ namespace FundooNotes
         {
             services.AddScoped<IUserBL, UserBL>();
             services.AddScoped<IUserRL, UserRL>();
+            services.AddScoped<INotesBL, NotesBL>();
+            services.AddScoped<INotesRL, NotesRL>();
             //services.AddDbContext<FundooNotesContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:UserDB"]));
-           
+
             services.AddDbContext<FundooNotesContext>(option => option.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStringDB")));
-           
+
             //Addjwt authentication
             services.AddAuthentication(options =>
             {
@@ -58,7 +60,7 @@ namespace FundooNotes
                     ValidateAudience = true,       
                     ValidIssuer = Environment.GetEnvironmentVariable("jwtValidIssuer"),
                     ValidAudience = Environment.GetEnvironmentVariable("jwtValidAudience"),
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("jwtSecretKey"))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("jwtSecretKey")))
 
                 };
             });
@@ -80,7 +82,7 @@ namespace FundooNotes
 
             app.UseHttpsRedirection();
             app.UseRouting();
-            app.UseAuthorization();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

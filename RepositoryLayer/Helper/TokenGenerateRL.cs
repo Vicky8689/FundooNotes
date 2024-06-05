@@ -26,7 +26,7 @@ namespace RepositoryLayer.Helper
            };
             
             var Securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("jwtSecretKey")));
-            
+           
             var creds = new SigningCredentials(Securitykey,SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
