@@ -52,7 +52,7 @@ namespace FundooNotes.Controllers
 
         //login
         [Route("login")]
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> LoginController(LoginRequestModel loginModel)
         {
             var result = await _userBL.Login(loginModel);

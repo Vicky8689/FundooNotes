@@ -142,7 +142,7 @@ namespace FundooNotes.Controllers
         [HttpGet]
         [Authorize]
         [Route("NoteById")]
-        public IActionResult GetNotesByIdController(NoteByIdrequestModel requestModel)
+        public IActionResult GetNotesByIdController([FromQuery] NoteByIdrequestModel requestModel)
         {
             ResponseModel<NotesResponseModel> response = new ResponseModel<NotesResponseModel>();
             

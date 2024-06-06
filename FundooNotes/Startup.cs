@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Services;
@@ -65,9 +66,44 @@ namespace FundooNotes
                 };
             });
 
+            //addSwagger
+            services.AddSwaggerGen(options=>
+            {
+                options.AddSecurityDefinition(
+                    name: JwtBearerDefaults.AuthenticationScheme,
+                    securityScheme:new OpenApiSecurityScheme{
+                        Name="Authorization",
+                        Description="Enter the Bearer Authoriztion : `Bearer Generated-Token`",
+                        In= ParameterLocation.Header,
+                        Type=SecuritySchemeType.ApiKey,
+                        Scheme="Bearer"
+                    });
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference{
+                            Type = ReferenceType.SecurityScheme,
+                            Id=JwtBearerDefaults.AuthenticationScheme
+                        }
+                    },new string[] {}
+                    }
+                });
+                
+            });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                       Version = "v1",
+                       Title ="Implement Swagger",
+                       Description = "Fundoo Notes APIs",
+                          
+                    });
+            });
 
 
-            //Addjwt authentication
+
 
             services.AddControllers();
         }
@@ -84,6 +120,10 @@ namespace FundooNotes
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            //SwaggerAdded
+            app.UseSwagger();
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Showing API V1"); });
 
             app.UseEndpoints(endpoints =>
             {
