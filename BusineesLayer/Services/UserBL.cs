@@ -48,11 +48,44 @@ namespace BusineesLayer.Services
                 if (verifyUser)
                 {
 
-                return new TokenGenerateRL().GenerateTokenRL(result);
+                return TokenGenerateRL.GenerateTokenRL(result);
                 }
               //  return verifyUser;
             }
             return null;
+        }
+
+
+        public async Task<string> ForgotPassword(ForgotPasswordRequestModel requestModel)
+        {
+            var result =await _userRL.ForgotPassword(requestModel);
+            if (result != null)
+            {
+                var genratedToken = TokenGenerateRL.GenerateTokenRL(result);
+                //send email
+               var emailStatus =  EmailSender.sendMail(requestModel.email, genratedToken);
+
+                if (emailStatus)
+                {
+                    return $"Mail Send succesful on {requestModel.email} ";
+                }
+                else
+                {
+                    return "Email Not send";
+                }
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+
+        public async Task<UserEntity> ResetPass(int userId ,ResetPassRequestModel passModel)
+        {
+            var hashPass = HashPasswordBL.HashPsaaword(passModel.pass);
+            return await _userRL.ResetPass(userId, hashPass);
         }
 
     }

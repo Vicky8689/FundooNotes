@@ -1,8 +1,11 @@
 ﻿using BusineesLayer.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Helper;
+using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
@@ -31,7 +34,7 @@ namespace FundooNotes.Controllers
                 registrationResponseModel.LastName = userModel.LastName;
                 registrationResponseModel.Email = userModel.Email;
 
-
+                var emailStatus = EmailSender.sendMail(userModel.Email, "You are Registered");
                 responseModel.Message = "You are Registerd";
                 responseModel.Data = registrationResponseModel;
                 
@@ -80,12 +83,63 @@ namespace FundooNotes.Controllers
 
         }
 
-       
+        //forgotPassword
+        [Route("forgotpass")]
+        [HttpPost]
+        public async Task<IActionResult> ForgotPasswordController(ForgotPasswordRequestModel requestModel)
+        {
+
+            var result = await _userBL.ForgotPassword(requestModel);
+            ResponseModel<string> response = new ResponseModel<string>();
+            try
+            {
+                if (result != null)
+                {
+
+                    response.Message = result;
+                    response.Data = requestModel.email;
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "User Not found";
+                }
+            }catch(Exception ex) { }
+            return Ok(response);
+            
+        }
+
+        //resetPassword
+        [Route("resetpass")]
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ResetPasswordController(ResetPassRequestModel passModel)
+        {
+            ResponseModel<ResetPassResponseModel> response =new ResponseModel<ResetPassResponseModel>();
+            try
+            {
+            var id = User.FindFirstValue("UserID");
+            int userId = Convert.ToInt32(id);
+            var result = await _userBL.ResetPass(userId , passModel);
+                if (result != null)
+                {
+                    ResetPassResponseModel responseData = new ResetPassResponseModel() { email = result.Email };
+                    response.Message = "Passwors Reset Succesful..";
+                    response.Data = responseData;
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Unsuccesful";
+                }
+            }catch(Exception ex) { }
+
+            return Ok(response);
 
 
 
-    
-    
+
+        }
     
     }
 }

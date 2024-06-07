@@ -11,5 +11,9 @@ namespace BusineesLayer.Interface
     {
         public Task<bool> UserRegistration(RegistrationRequestModel userModel);
         public Task<string> Login(LoginRequestModel loginModel);
+
+        public Task<string> ForgotPassword(ForgotPasswordRequestModel requestModel);
+
+        public Task<UserEntity> ResetPass(int userId , ResetPassRequestModel passModel);
     }
 }

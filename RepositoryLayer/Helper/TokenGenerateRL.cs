@@ -13,7 +13,7 @@ namespace RepositoryLayer.Helper
     public class TokenGenerateRL
     {
         
-        public string GenerateTokenRL(UserEntity userEntity)
+        public static string GenerateTokenRL(UserEntity userEntity)
         {
             var authClaims = new[]
             {

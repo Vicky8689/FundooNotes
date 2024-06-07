@@ -2,9 +2,11 @@
 using ModelLayer.Model;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
+using RepositoryLayer.Helper;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,6 +59,31 @@ namespace RepositoryLayer.Services
 
         }
 
+        //forgotpassword
+        public async Task<UserEntity> ForgotPassword(ForgotPasswordRequestModel requestModel)
+        {
+            return await _Context.Users.FirstOrDefaultAsync(x => x.Email == requestModel.email);
+        }
 
+        //resetpassword
+
+        public async Task<UserEntity> ResetPass(int userId, string hashPass)
+        {
+            var getUserData = await _Context.Users.FirstOrDefaultAsync(x=>x.UserId == userId);
+            if (getUserData != null)
+            {
+                getUserData.Password = hashPass;
+                _Context.Update(getUserData);
+                await _Context.SaveChangesAsync();
+                return getUserData;
+            }
+            else
+            {
+                return null;
+
+            }
+
+            
+        }
     }
 }
