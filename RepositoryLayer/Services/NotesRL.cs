@@ -1,4 +1,6 @@
 ﻿using ModelLayer.Model;
+using NLog;
+using NLog.Web;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Interface;
@@ -13,6 +15,7 @@ namespace RepositoryLayer.Services
     public class NotesRL: INotesRL
     {
         private readonly FundooNotesContext _context;
+        Logger logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
         public NotesRL(FundooNotesContext context)
         {
             _context = context;
@@ -21,6 +24,7 @@ namespace RepositoryLayer.Services
         //GetAllNotes
         public List<GetAllNotesResponseModel> GetAllNotes(int userId)
         {
+            try { 
             var data = _context.Notes.Where(x => x.UserId == userId).ToList();
             List<GetAllNotesResponseModel> allNotes = new List<GetAllNotesResponseModel>();
             
@@ -36,12 +40,21 @@ namespace RepositoryLayer.Services
             }
 
             return allNotes;
+
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return null;
+            }
         }
 
         //AddNote
         public bool AddNote(AddNotesRequestModel addNotesRequestModel, int userId)
         {
-           
+            try
+            {
+            
             NotesEntity notes = new NotesEntity();
             notes.Title= addNotesRequestModel.Title;
             notes.Description= addNotesRequestModel.Description;
@@ -53,8 +66,14 @@ namespace RepositoryLayer.Services
             {
                 return true;
             }
-
             return false;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return false;
+                
+            }
         }
 
 
@@ -62,15 +81,24 @@ namespace RepositoryLayer.Services
         //DeleteNoteById
         public NotesEntity DeleteNoteById(int userId, int noteId)
         {
-            var findEntitynote = _context.Notes.FirstOrDefault(x=>x.NoteId == noteId && x.UserId==userId);
-            if(findEntitynote != null)
-            {
-                var rm = _context.Notes.Remove(findEntitynote);
-                _context.SaveChanges();
-                return findEntitynote;
+            try 
+            { 
+
+                var findEntitynote = _context.Notes.FirstOrDefault(x=>x.NoteId == noteId && x.UserId==userId);
+                if(findEntitynote != null)
+                {
+                    var rm = _context.Notes.Remove(findEntitynote);
+                    _context.SaveChanges();
+                    return findEntitynote;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (Exception ex)
             {
+                logger.Error(ex, "Exception Caught");
                 return null;
             }
         }
@@ -78,31 +106,146 @@ namespace RepositoryLayer.Services
         //UpdateNoteById
         public NotesEntity UpdateNoteById(int userId, int noteId, UpdateNoteRequestModel data)
         {
-            var note = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
-            if(note != null)
-            {
-                note.Title = data.title;
-                note.Description=data.description;
-                note.Color= data.color;
-                _context.Update(note);
-                _context.SaveChanges();
-            return note;
+            try 
+            { 
+                var note = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
+                if(note != null)
+                {
+                    note.Title = data.title;
+                    note.Description=data.description;
+                    note.Color= data.color;
+                    _context.Update(note);
+                    _context.SaveChanges();
+                return note;
+                }
+                return null;
             }
-            return null;
-
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return null;
+            }
         }
 
         public NotesEntity NotesById(int userId, int noteId)
         {
-            var getNote = _context.Notes.FirstOrDefault(x=>x.UserId==userId && x.NoteId==noteId);
-            if(getNote != null)
-            {
-                return getNote;
+            try
+            { 
+                var getNote = _context.Notes.FirstOrDefault(x=>x.UserId==userId && x.NoteId==noteId);
+                if(getNote != null)
+                {
+                    return getNote;
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch (Exception ex)
             {
+                logger.Error(ex, "Exception Caught");
                 return null;
             }
         }
+
+
+        public bool TrashNote(int userId, int noteId)
+        {
+            try
+            { 
+                var getNoterData=_context.Notes.FirstOrDefault(x=>x.UserId== userId && x.NoteId==noteId);
+                if (getNoterData != null)
+                {
+                    getNoterData.IsTrash = true;
+                    _context.Update(getNoterData);
+                    _context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return false;
+            }
+        }
+
+
+        public bool UnTrashNote(int userId, int noteId)
+        {
+            try
+            { 
+                var getNoterData = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
+                if (getNoterData != null)
+                {
+                    getNoterData.IsTrash = false;
+                    _context.Update(getNoterData);
+                    _context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return false;
+            }
+        }
+
+        public bool ArchiveNote(int userId, int noteId)
+        {
+            try
+            { 
+                var getNoterData = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
+                if (getNoterData != null)
+                {
+                    getNoterData.IsArchive = true;
+                    _context.Update(getNoterData);
+                    _context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return false;
+            }
+        }
+
+        public bool UnArchiveNote(int userId, int noteId)
+        {
+            try
+            { 
+                var getNoterData = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
+                if (getNoterData != null)
+                {
+                    getNoterData.IsArchive = false;
+                    _context.Update(getNoterData);
+                    _context.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "Exception Caught");
+                return false;
+            }
+        }
+
+
     }
 }

@@ -44,5 +44,29 @@ namespace BusineesLayer.Services
             return _notesRL.NotesById(userId, noteId);
         }
 
+
+        //trash note 
+        public bool TrashNote(int userId, int noteId)
+        {
+            return _notesRL.TrashNote(userId, noteId);
+        }
+
+        //trash note 
+        public bool UnTrashNote(int userId, int noteId)
+        {
+            return _notesRL.UnTrashNote(userId, noteId);
+        }
+
+        //ArchiveNote
+        public bool ArchiveNote(int userId, int noteId)
+        {
+            return _notesRL.ArchiveNote(userId, noteId);
+        }
+
+        //UnArchiveNote
+        public bool UnArchiveNote(int userId, int noteId)
+        {
+            return _notesRL.UnArchiveNote(userId, noteId);
+        }
     }
 }

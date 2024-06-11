@@ -1,30 +1,38 @@
 ﻿using BusineesLayer.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
+using NLog;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Helper;
 using System;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
-
 namespace FundooNotes.Controllers
 {
     [ApiController]
     [Route("fundoonotes")]
     public class LoginRegistrationController : Controller
     {
+       // private const string SessionName = "_Name";
+       
         private readonly IUserBL _userBL;
-        
-        public LoginRegistrationController(IUserBL userBL)
+        public LoginRegistrationController(IUserBL userBL )
         {
-            _userBL = userBL;           
+            _userBL = userBL;
+           
         }
+       
         //Registration
         [Route("Registration")]
         [HttpPost]
         public async Task<IActionResult> RegistrationController(RegistrationRequestModel userModel)
         {
+
             var result = await _userBL.UserRegistration(userModel);
             ResponseModel<RegistrationResponseModel> responseModel = new ResponseModel<RegistrationResponseModel>();
             if (result)
@@ -54,20 +62,27 @@ namespace FundooNotes.Controllers
 
 
         //login
+        [EnableCors("AlloweOrigin")]
         [Route("login")]
         [HttpPost]
         public async Task<IActionResult> LoginController(LoginRequestModel loginModel)
         {
+            //session management 
+           
             var result = await _userBL.Login(loginModel);
             ResponseModel<LoginResponseModel> response = new ResponseModel<LoginResponseModel>();
             LoginResponseModel loginResponseModel = new LoginResponseModel();
+           
             if (result!=null)
             {
-                
+                //session started
+                HttpContext.Session.SetString("email", loginModel.Email);
+
                 loginResponseModel.Email = loginModel.Email;
                 response.Success = true;
                 response.Message = result;
                 response.Data = loginResponseModel;
+              
                 return Ok(response);
             }
             else
@@ -76,6 +91,7 @@ namespace FundooNotes.Controllers
                 response.Success = false;
                 response.Message = "Invalid Credentials";
                 response.Data = loginResponseModel;
+              
                 return BadRequest(response);
             }
 

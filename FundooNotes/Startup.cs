@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NLog;
 using RepositoryLayer.Context;
 using RepositoryLayer.Interface;
 using RepositoryLayer.Services;
@@ -21,6 +22,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace FundooNotes
 {
@@ -67,6 +69,12 @@ namespace FundooNotes
                 };
             });
 
+            //session management 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(1); });
+
+
+
             //addSwagger
             services.AddSwaggerGen(options=>
             {
@@ -98,14 +106,35 @@ namespace FundooNotes
                 c.SwaggerDoc("v1", new OpenApiInfo { 
                        Version = "v1",
                        Title ="Implement Swagger",
-                       Description = "Fundoo Notes APIs",
+                       Description = $"Fundoo Notes APIs",
                           
                     });
             });
 
+            //session management 
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromSeconds(30); // Session timeout
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
-           
 
+            //adding cors
+            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "AlloweOrigin",
+                  build => {
+                      build.WithOrigins("https://localhost:5001").AllowAnyHeader();
+
+                  }
+                    );
+
+            });
+
+         
 
             services.AddControllers();
         }
@@ -117,7 +146,10 @@ namespace FundooNotes
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            //use Core
+            app.UseCors("AlloweOrigin");
+            //use Session
+            app.UseSession();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();

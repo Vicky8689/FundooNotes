@@ -1,5 +1,6 @@
 ﻿using BusineesLayer.Interface;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ModelLayer.Model;
 using RepositoryLayer.Entity;
 using RepositoryLayer.Helper;
@@ -7,6 +8,7 @@ using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +19,7 @@ namespace BusineesLayer.Services
     {
         private readonly IUserRL _userRL;
         private readonly IConfiguration _configuration;
+
         public UserBL(IUserRL userRL,IConfiguration configuration)
         {
             _userRL = userRL;
@@ -25,14 +28,16 @@ namespace BusineesLayer.Services
        
         public async Task<bool> UserRegistration(RegistrationRequestModel userModel)
         {
-            //Hash the user password
-            userModel.Password = HashPasswordBL.HashPsaaword(userModel.Password);
+            
+                //Hash the user password
+                userModel.Password = HashPasswordBL.HashPsaaword(userModel.Password);
 
-            var result = await _userRL.UserRegistration(userModel);
-            if (result != null)
-            {
-                return true;
-            }
+                var result = await _userRL.UserRegistration(userModel);
+                if (result != null)
+                {
+                    return true;
+                }
+           
 
             return false;
 
@@ -88,5 +93,6 @@ namespace BusineesLayer.Services
             return await _userRL.ResetPass(userId, hashPass);
         }
 
+       
     }
 }

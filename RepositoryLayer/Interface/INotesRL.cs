@@ -17,6 +17,11 @@ namespace RepositoryLayer.Interface
         public NotesEntity UpdateNoteById(int userId, int noteId , UpdateNoteRequestModel data);
 
         public NotesEntity NotesById(int userId, int noteId);
+
+        public bool TrashNote(int userId, int noteId);
+        public bool UnTrashNote(int userId, int noteId);
+        public bool ArchiveNote(int userId, int noteId);
+        public bool UnArchiveNote(int userId, int noteId);
     }
 
 }
