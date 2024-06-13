@@ -18,7 +18,7 @@ namespace FundooNotes.Controllers
     [Route("fundoonotes")]
     public class LoginRegistrationController : Controller
     {
-       // private const string SessionName = "_Name";
+       
        
         private readonly IUserBL _userBL;
         public LoginRegistrationController(IUserBL userBL )
@@ -62,13 +62,12 @@ namespace FundooNotes.Controllers
 
 
         //login
-        [EnableCors("AlloweOrigin")]
+       // [EnableCors("AlloweOrigin")]
         [Route("login")]
         [HttpPost]
         public async Task<IActionResult> LoginController(LoginRequestModel loginModel)
         {
-            //session management 
-           
+            
             var result = await _userBL.Login(loginModel);
             ResponseModel<LoginResponseModel> response = new ResponseModel<LoginResponseModel>();
             LoginResponseModel loginResponseModel = new LoginResponseModel();

@@ -23,6 +23,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using StackExchange.Redis;
 
 namespace FundooNotes
 {
@@ -42,8 +43,6 @@ namespace FundooNotes
             services.AddScoped<IUserRL, UserRL>();
             services.AddScoped<INotesBL, NotesBL>();
             services.AddScoped<INotesRL, NotesRL>();
-            //services.AddDbContext<FundooNotesContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:UserDB"]));
-
             services.AddDbContext<FundooNotesContext>(option => option.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStringDB")));
 
             //Addjwt authentication
@@ -69,10 +68,7 @@ namespace FundooNotes
                 };
             });
 
-            //session management 
-            services.AddDistributedMemoryCache();
-            services.AddSession(options => { options.IdleTimeout = TimeSpan.FromMinutes(1); });
-
+           
 
 
             //addSwagger
@@ -115,7 +111,7 @@ namespace FundooNotes
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromSeconds(30); // Session timeout
+                options.IdleTimeout = TimeSpan.FromMinutes(10);// Session timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
@@ -126,7 +122,8 @@ namespace FundooNotes
             services.AddCors(options =>
             {
                 options.AddPolicy(name: "AlloweOrigin",
-                  build => {
+                  build =>
+                  {
                       build.WithOrigins("https://localhost:5001").AllowAnyHeader();
 
                   }
@@ -134,7 +131,12 @@ namespace FundooNotes
 
             });
 
-         
+            //redis configuratuion
+            services.AddStackExchangeRedisCache(options =>
+            { 
+                options.Configuration = "localhost:6379";
+                
+            });
 
             services.AddControllers();
         }

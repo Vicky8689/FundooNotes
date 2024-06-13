@@ -2,12 +2,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using ModelLayer.Model;
+
+using Newtonsoft.Json.Linq;
 using RepositoryLayer.Entity;
+using RepositoryLayer.Helper;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace FundooNotes.Controllers
@@ -18,38 +25,54 @@ namespace FundooNotes.Controllers
     public class NotesController : ControllerBase
     {
         private readonly INotesBL _notesBL;
-     
-        public NotesController(INotesBL notesBL)
+        private IDistributedCache _cache;
+        RedisMethods cacheMethod;
+        public NotesController(INotesBL notesBL, IDistributedCache cache)
         {
             _notesBL = notesBL;
-           
+            cacheMethod = new RedisMethods(cache);
+            _cache = cache;
         }
+
+        
+
         //GetAllNotes
         [HttpGet]
         [Authorize]
         [Route("GetAllNotes")]
         public IActionResult GetAllNotesController()
         {
+
+
             if (HttpContext.Session.GetString("email") != null)
             {
                 ResponseModel<List<GetAllNotesResponseModel>> response = new ResponseModel<List<GetAllNotesResponseModel>>();
-              
-                
+                              
                 try
                 {
-                    var id = User.FindFirstValue("email");
+                    var id = User.FindFirstValue("UserID");
                     int userId = Convert.ToInt32(id);
-                    var result = _notesBL.GetAllNotes(userId);
-
-                    if (result != null)
+                    //get data from redis
+                    var cacheData = _cache.GetString(id);
+                    if (cacheData != null)
                     {
-                        response.Message = "Successfully";
-                        response.Data = result;
-
+                        response.Message = "data from redis Successfully";
+                        response.Data = JsonSerializer.Deserialize<List<GetAllNotesResponseModel>>(cacheData);
                     }
                     else
                     {
-                        response.Message = "Unsuccessfully";
+                        var result = _notesBL.GetAllNotes(userId);
+                        if (result != null)
+                        {
+                            //set data in redis
+                            cacheMethod.SetCache(id,result);
+                            response.Message = "Successfully";
+                            response.Data = result;
+                        }
+                        else
+                        {
+                            response.Message = "Unsuccessfully";
+                        }
                     }
                 }
                 catch (Exception ex) { }
@@ -77,6 +100,7 @@ namespace FundooNotes.Controllers
                 AddNotesResponseModel responseModel = new AddNotesResponseModel();
                 if (result)
                 {
+                    
                     responseModel.Title = addNotesRequestModel.Title;
                     response.Message = "Note Added successfully";
                     response.Data = responseModel;                  
@@ -181,18 +205,32 @@ namespace FundooNotes.Controllers
                 {
                     var id = User.FindFirstValue("UserID");
                     int userId = Convert.ToInt32(id);
-                    var result = _notesBL.NotesById(userId, requestModel.noteId);
+                    //get cache data
 
-                    if (result != null)
+                    var cacheData = _cache.GetString($"{id}:{requestModel.noteId}");
+                    if (cacheData != null)
                     {
-                        NotesResponseModel note = new NotesResponseModel() { noteId = result.NoteId, title = result.Title, description = result.Description, color = result.Color };
-                        response.Message = "Successfully";
-                        response.Data = note;
+                        response.Message = " data from redis Successfully";
+                        response.Data = JsonSerializer.Deserialize<NotesResponseModel>(cacheData);
                     }
                     else
                     {
-                        response.Message = "Unsuccessfully";
+
+                        var result = _notesBL.NotesById(userId, requestModel.noteId);
+
+                        if (result != null)
+                        {
+                            NotesResponseModel note = new NotesResponseModel() { noteId = result.NoteId, title = result.Title, description = result.Description, color = result.Color };
+                            _cache.SetString($"{id}:{requestModel.noteId}",JsonSerializer.Serialize(note));
+                            response.Message = "Successfully";
+                            response.Data = note;
+                        }
+                        else
+                        {
+                            response.Message = "Unsuccessfully";
+                        }
                     }
+                    
                 }
                 catch (Exception ex) { }
                 return Ok(response);

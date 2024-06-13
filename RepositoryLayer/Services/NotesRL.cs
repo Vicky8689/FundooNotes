@@ -1,8 +1,12 @@
-﻿using ModelLayer.Model;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Caching.Distributed;
+using ModelLayer.Model;
+using Newtonsoft.Json.Linq;
 using NLog;
 using NLog.Web;
 using RepositoryLayer.Context;
 using RepositoryLayer.Entity;
+using RepositoryLayer.Helper;
 using RepositoryLayer.Interface;
 using System;
 using System.Collections.Generic;
@@ -15,10 +19,15 @@ namespace RepositoryLayer.Services
     public class NotesRL: INotesRL
     {
         private readonly FundooNotesContext _context;
+        private IDistributedCache _cache;
+        RedisMethods cacheMethod;
         Logger logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-        public NotesRL(FundooNotesContext context)
+        public NotesRL(FundooNotesContext context , IDistributedCache cache)
         {
             _context = context;
+            cacheMethod = new RedisMethods(cache);
+            _cache = cache;
+           
         }
 
         //GetAllNotes
@@ -55,18 +64,26 @@ namespace RepositoryLayer.Services
             try
             {
             
-            NotesEntity notes = new NotesEntity();
-            notes.Title= addNotesRequestModel.Title;
-            notes.Description= addNotesRequestModel.Description;
-            notes.Color= addNotesRequestModel.Color;
-            notes.UserId= userId;
-            _context.Add(notes);
-            var result =  _context.SaveChanges();
-            if (result > 0)
-            {
-                return true;
-            }
-            return false;
+                NotesEntity notes = new NotesEntity();
+                notes.Title= addNotesRequestModel.Title;
+                notes.Description= addNotesRequestModel.Description;
+                notes.Color= addNotesRequestModel.Color;
+                notes.UserId= userId;
+                _context.Add(notes);
+                var result =  _context.SaveChanges();
+
+                if (result > 0)
+                {
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
+
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -89,6 +106,13 @@ namespace RepositoryLayer.Services
                 {
                     var rm = _context.Notes.Remove(findEntitynote);
                     _context.SaveChanges();
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
+
                     return findEntitynote;
                 }
                 else
@@ -116,7 +140,14 @@ namespace RepositoryLayer.Services
                     note.Color= data.color;
                     _context.Update(note);
                     _context.SaveChanges();
-                return note;
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
+
+                    return note;
                 }
                 return null;
             }
@@ -130,7 +161,9 @@ namespace RepositoryLayer.Services
         public NotesEntity NotesById(int userId, int noteId)
         {
             try
-            { 
+            {
+                
+
                 var getNote = _context.Notes.FirstOrDefault(x=>x.UserId==userId && x.NoteId==noteId);
                 if(getNote != null)
                 {
