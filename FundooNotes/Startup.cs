@@ -43,7 +43,16 @@ namespace FundooNotes
             services.AddScoped<IUserRL, UserRL>();
             services.AddScoped<INotesBL, NotesBL>();
             services.AddScoped<INotesRL, NotesRL>();
-            services.AddDbContext<FundooNotesContext>(option => option.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStringDB")));
+            services.AddScoped<ILableBL, LableBL>();
+            services.AddScoped<ILableRL, LableRL>();           
+
+            services.AddScoped<INoteLabelBL, NoteLabelBL>();
+            services.AddScoped<INoteLabelRL, NoteLabelRL>();
+            //access data from environmentvariavble
+            // services.AddDbContext<FundooNotesContext>(option => option.UseSqlServer(Environment.GetEnvironmentVariable("ConnectionStringDB")));
+            //access data from appsetting
+            services.AddDbContext<FundooNotesContext>(options => options.UseSqlServer(Configuration["ConnectionStrings:UserDB"]));
+
 
             //Addjwt authentication
             services.AddAuthentication(options =>

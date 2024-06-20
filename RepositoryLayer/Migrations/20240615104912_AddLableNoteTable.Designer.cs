@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RepositoryLayer.Context;
 
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(FundooNotesContext))]
-    partial class FundooNotesContextModelSnapshot : ModelSnapshot
+    [Migration("20240615104912_AddLableNoteTable")]
+    partial class AddLableNoteTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -40,7 +42,7 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("Labels");
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entity.NoteLableEntity", b =>
+            modelBuilder.Entity("RepositoryLayer.Entity.LabelNoteEntity", b =>
                 {
                     b.Property<int>("NoteLabelId")
                         .ValueGeneratedOnAdd()
@@ -59,7 +61,7 @@ namespace RepositoryLayer.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("NoteLable");
+                    b.ToTable("LabelNote");
                 });
 
             modelBuilder.Entity("RepositoryLayer.Entity.NotesEntity", b =>
@@ -138,7 +140,7 @@ namespace RepositoryLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RepositoryLayer.Entity.NoteLableEntity", b =>
+            modelBuilder.Entity("RepositoryLayer.Entity.LabelNoteEntity", b =>
                 {
                     b.HasOne("RepositoryLayer.Entity.LabelEntity", "Label")
                         .WithMany()

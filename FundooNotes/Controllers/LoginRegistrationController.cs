@@ -1,4 +1,5 @@
 ﻿using BusineesLayer.Interface;
+using FundooNotes.ProducerFolder;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +43,12 @@ namespace FundooNotes.Controllers
                 registrationResponseModel.LastName = userModel.LastName;
                 registrationResponseModel.Email = userModel.Email;
 
-                var emailStatus = EmailSender.sendMail(userModel.Email, "You are Registered");
+                //send Mail
+                
+
+                Producer.SentMailProducer(userModel.Email,"You are Registered");
+               
+
                 responseModel.Message = "You are Registerd";
                 responseModel.Data = registrationResponseModel;
                 
