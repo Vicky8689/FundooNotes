@@ -44,8 +44,8 @@ namespace FundooNotes.Controllers
         {
 
 
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
                 ResponseModel<List<GetAllNotesResponseModel>> response = new ResponseModel<List<GetAllNotesResponseModel>>();
                               
                 try
@@ -77,8 +77,8 @@ namespace FundooNotes.Controllers
                 }
                 catch (Exception ex) { }
                 return Ok(response);
-            }
-            else { return Ok("session time out"); }
+            //}
+            //else { return Ok("session time out123"); }
         }
 
         //AddNote
@@ -87,8 +87,8 @@ namespace FundooNotes.Controllers
         [Route("AddNotes")]
         public IActionResult AddNotesController(AddNotesRequestModel addNotesRequestModel)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
 
             ResponseModel<AddNotesResponseModel> response = new ResponseModel<AddNotesResponseModel>();
             try
@@ -112,8 +112,8 @@ namespace FundooNotes.Controllers
                 }              
             }catch(Exception ex) { }
             return Ok(response);
-            }
-            else { return Ok("session time out"); }
+            //}
+            //else { return Ok("session time out134"); }
         }
 
         //DeleteNote
@@ -122,8 +122,9 @@ namespace FundooNotes.Controllers
         [Route("DeleteNote")]
         public IActionResult DeleteNoteByIdController([FromQuery] int noteId)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
+            Console.WriteLine("this is id:"+noteId + "***************************************************************************************************************");
                 var getUserId = User.FindFirstValue("UserID");
                 int userId = Convert.ToInt32(getUserId);
 
@@ -147,8 +148,8 @@ namespace FundooNotes.Controllers
                 }
                 catch (Exception ex) { }
                 return Ok(responseModel);
-            }
-            else { return Ok("Session timeout"); }
+            //}
+            //else { return Ok("Session timeout"); }
         }
 
 
@@ -158,8 +159,8 @@ namespace FundooNotes.Controllers
         [Route("UpdateNote")]
         public IActionResult  UpdateNoteByIdController([FromQuery] int noteId, [FromQuery] string title, [FromQuery] string description, [FromQuery] string color)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
 
 
                 ResponseModel<UpdateNoteResponseModel> response = new ResponseModel<UpdateNoteResponseModel>();
@@ -186,9 +187,43 @@ namespace FundooNotes.Controllers
                 }
                 catch (Exception ex) { }
                 return Ok(response);
-            }
-            else { return Ok("session timeout"); }
+            //}
+            //else { return Ok("session timeout"); }
         }
+
+        //update note color
+        [HttpPut]
+        [Authorize]
+        [Route("UpdateColorNote")]
+        public IActionResult UpdateNoteColorByIdController(int noteId, string color)
+        {
+            
+            ResponseModel<string> response = new ResponseModel<string>();
+            try
+            {
+
+                //store Input Data
+                //UpdateNoteRequestModel data = new UpdateNoteRequestModel() { title = title, description = description, color = color };
+                var getUserId = User.FindFirstValue("UserID");
+                int userId = Convert.ToInt32(getUserId);
+                var result = _notesBL.UpdateNoteColorById(userId, noteId, color);
+                if (result != null)
+                {
+                  //  UpdateNoteResponseModel updatedNote = new UpdateNoteResponseModel() { color = result.Color };
+                    response.Message = "Successful";
+                   
+
+                }
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Unsuccessful";
+                }
+            }
+                catch (Exception ex) { }
+            return Ok(response);
+        }
+        //else { return Ok("session timeout"); }
 
         //GetNoteById
         [HttpGet]
@@ -196,8 +231,8 @@ namespace FundooNotes.Controllers
         [Route("NoteById")]
         public IActionResult GetNotesByIdController([FromQuery] NoteByIdrequestModel requestModel)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
                 ResponseModel<NotesResponseModel> response = new ResponseModel<NotesResponseModel>();
 
 
@@ -234,8 +269,8 @@ namespace FundooNotes.Controllers
                 }
                 catch (Exception ex) { }
                 return Ok(response);
-            }
-            else { return Ok("session timeout"); }
+            //}
+            //else { return Ok("session timeout"); }
         }
 
         //trashNote
@@ -244,8 +279,8 @@ namespace FundooNotes.Controllers
         [Route("trashNote")]
         public IActionResult TrashNoteController([FromQuery] int noteId)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
 
                 var id = User.FindFirstValue("UserID");
                 var userId = Convert.ToInt32(id);
@@ -253,14 +288,16 @@ namespace FundooNotes.Controllers
                 ResponseModel<string> response = new ResponseModel<string>();
                 if (result)
                 {
+                    
                     response.Message = "Trash Successful";
                 }
                 else
                 {
+                    response.Success= false;
                     response.Message = "Unsuccesful";
                 }
                 return Ok(response);
-            }else { return Ok("session timeout"); }
+            //}else { return Ok("session timeout"); }
         }
 
         //UntrashNote
@@ -269,8 +306,8 @@ namespace FundooNotes.Controllers
         [Route("unTrashNote")]
         public IActionResult UnTrashNoteController([FromQuery] int noteId)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
                 var id = User.FindFirstValue("UserID");
                 var userId = Convert.ToInt32(id);
 
@@ -285,8 +322,8 @@ namespace FundooNotes.Controllers
                     response.Message = "Unsuccesful";
                 }
                 return Ok(response);
-            }
-            else { return Ok("session timeout "); }
+            //}
+            //else { return Ok("session timeout "); }
         }
 
         //Archive 
@@ -295,8 +332,9 @@ namespace FundooNotes.Controllers
         [Route("ArchiveNote")]
         public IActionResult ArchiveNoteController([FromQuery] int noteId)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+          
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
             
                 var id = User.FindFirstValue("UserID");
                 var userId = Convert.ToInt32(id);
@@ -311,8 +349,8 @@ namespace FundooNotes.Controllers
                     response.Message = "Unsuccesful";
                 }
                 return Ok(response);
-            }
-            else { return Ok("session time out"); }
+            //}
+            //else { return Ok("session time out"); }
         }
 
         //UnArchive 
@@ -321,8 +359,8 @@ namespace FundooNotes.Controllers
         [Route("UnArchiveNote")]
         public IActionResult UnArchiveNoteController([FromQuery] int noteId)
         {
-            if (HttpContext.Session.GetString("email") != null)
-            {
+            //if (HttpContext.Session.GetString("email") != null)
+            //{
                 var id = User.FindFirstValue("UserID");
                 var userId = Convert.ToInt32(id);
                 var result = _notesBL.UnArchiveNote(userId, noteId);
@@ -336,10 +374,11 @@ namespace FundooNotes.Controllers
                     response.Message = "Unsuccesful";
                 }
                 return Ok(response);
-            }
-            else { return Ok("session timeout"); }
+            //}
+            //else { return Ok("session timeout"); }
         }
 
-
+     
+    
     }
 }

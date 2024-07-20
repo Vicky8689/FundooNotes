@@ -11,5 +11,9 @@ namespace ModelLayer.Model
         public string title { get; set; }       
         public string description { get; set; } 
         public string color { get; set; }
+
+        public bool isArchive { get; set; } 
+
+        public bool isTrash { get; set; } 
     }
 }

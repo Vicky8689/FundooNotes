@@ -17,6 +17,8 @@ namespace FundooNotes.Controllers
 {
     [ApiController]
     [Route("fundoonotes")]
+    [EnableCors]
+
     public class LoginRegistrationController : Controller
     {
        
@@ -29,8 +31,10 @@ namespace FundooNotes.Controllers
         }
        
         //Registration
+
         [Route("Registration")]
         [HttpPost]
+        
         public async Task<IActionResult> RegistrationController(RegistrationRequestModel userModel)
         {
 

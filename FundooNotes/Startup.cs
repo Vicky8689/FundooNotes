@@ -23,7 +23,11 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Cors;
 using StackExchange.Redis;
+using System.Web;
+
+
 
 namespace FundooNotes
 {
@@ -35,7 +39,7 @@ namespace FundooNotes
         }
 
         public IConfiguration Configuration { get; }
-
+        const string policyName = "AlloweOrigin";
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -120,23 +124,22 @@ namespace FundooNotes
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
-                options.IdleTimeout = TimeSpan.FromMinutes(10);// Session timeout
+                options.IdleTimeout = TimeSpan.FromMinutes(100);// Session timeout
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
 
 
             //adding cors
-            services.AddCors();
+
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "AlloweOrigin",
-                  build =>
-                  {
-                      build.WithOrigins("https://localhost:5001").AllowAnyHeader();
-
-                  }
-                    );
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
 
             });
 
@@ -158,11 +161,13 @@ namespace FundooNotes
                 app.UseDeveloperExceptionPage();
             }
             //use Core
-            app.UseCors("AlloweOrigin");
+            
+           
             //use Session
             app.UseSession();
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors();
             app.UseAuthentication();
             app.UseAuthorization();
             
@@ -173,6 +178,7 @@ namespace FundooNotes
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+               
             });
         }
     }

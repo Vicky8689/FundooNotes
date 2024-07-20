@@ -45,6 +45,11 @@ namespace RepositoryLayer.Services
                 note.title = item.Title;
                 note.description = item.Description;
                 note.color = item.Color;
+                note.isArchive=item.IsArchive;
+                note.isTrash = item.IsTrash;
+
+
+
                 allNotes.Add(note);
             }
 
@@ -157,7 +162,28 @@ namespace RepositoryLayer.Services
                 return null;
             }
         }
+        //updateclolor
+        public NotesEntity UpdateNoteColorById(int userId, int noteId, string data)
+        {
+            var note = _context.Notes.FirstOrDefault(x => x.UserId == userId && x.NoteId == noteId);
+            if (note != null)
+            {
+           
+                note.Color = data;
+                _context.Update(note);
+                _context.SaveChanges();
+                //remove redis data
+                var cacheData = _cache.GetString(Convert.ToString(userId));
+                if (cacheData != null)
+                {
+                    cacheMethod.RemoveCache(Convert.ToString(userId));
+                }
 
+                return note;
+            }
+            return null;
+        }
+        //get note by id
         public NotesEntity NotesById(int userId, int noteId)
         {
             try
@@ -192,6 +218,12 @@ namespace RepositoryLayer.Services
                     getNoterData.IsTrash = true;
                     _context.Update(getNoterData);
                     _context.SaveChanges();
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
                     return true;
                 }
                 else
@@ -217,6 +249,12 @@ namespace RepositoryLayer.Services
                     getNoterData.IsTrash = false;
                     _context.Update(getNoterData);
                     _context.SaveChanges();
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
                     return true;
                 }
                 else
@@ -241,6 +279,12 @@ namespace RepositoryLayer.Services
                     getNoterData.IsArchive = true;
                     _context.Update(getNoterData);
                     _context.SaveChanges();
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
                     return true;
                 }
                 else
@@ -265,6 +309,12 @@ namespace RepositoryLayer.Services
                     getNoterData.IsArchive = false;
                     _context.Update(getNoterData);
                     _context.SaveChanges();
+                    //remove redis data
+                    var cacheData = _cache.GetString(Convert.ToString(userId));
+                    if (cacheData != null)
+                    {
+                        cacheMethod.RemoveCache(Convert.ToString(userId));
+                    }
                     return true;
                 }
                 else
